@@ -1,9 +1,9 @@
 CREATE TABLE company_user
 (
-    id          BIGSERIAL        PRIMARY KEY,
+    id          BIGSERIAL PRIMARY KEY,
     email       VARCHAR(120) NOT NULL,
     telephone   VARCHAR(15)  NOT NULL,
-    password    VARCHAR(255)  NOT NULL,
+    password    VARCHAR(255) NOT NULL,
     first_name  VARCHAR(30)  NOT NULL,
     family_name VARCHAR(30)  NOT NULL,
     role        VARCHAR(10)  NOT NULL,
@@ -22,12 +22,13 @@ CREATE table company
     PRIMARY KEY (id)
 );
 
-drop table  electric_meter_data;
-CREATE TABLE electric_meter_data (
+drop table electric_meter_data;
+CREATE TABLE electric_meter_data
+(
     id                                  BIGINT                                 NOT NULL
         PRIMARY KEY,
     el_meter                            BIGINT                                 NOT NULL
-        REFERENCES public.electric_meter(id),
+        REFERENCES public.electric_meter (id),
     voltage_l1_n                        NUMERIC(5, 2)                          NOT NULL,
     voltage_l2_n                        NUMERIC(5, 2)                          NOT NULL,
     voltage_l3_n                        NUMERIC(5, 2)                          NOT NULL,
@@ -45,3 +46,91 @@ CREATE TABLE electric_meter_data (
     total_active_energy_import_tariff_2 NUMERIC(12, 2)                         NOT NULL,
     time_stamp                          TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
 );
+
+
+create table unit(
+   id          SERIAL        PRIMARY KEY,
+   unit_name  VARCHAR(150)  NOT NULL,
+   unit_value VARCHAR(10)  NOT NULL
+);
+
+create table production_group(
+   id          SERIAL        PRIMARY KEY,
+   production_group_name  VARCHAR(150)  NOT NULL,
+   description VARCHAR(150)  NOT NULL,
+   company BIGINT NOT NULL REFERENCES public.company(id)
+);
+
+create table electric_meter_production(
+   production  BIGINT NOT NULL,
+   electric_meter BIGINT NOT NULL,
+   PRIMARY KEY (production, electric_meter),
+   FOREIGN KEY (production) REFERENCES public.production(id) ON DELETE CASCADE,
+   FOREIGN KEY (electric_meter) REFERENCES public.electric_meter(id) ON DELETE CASCADE
+);
+
+create table production(
+   id SERIAL        PRIMARY KEY NOT NULL,
+   production_name  VARCHAR(150)  NOT NULL,
+   description VARCHAR(150)  NOT NULL,
+   ts timestamp not null,
+   units BIGINT NOT NULL REFERENCES public.unit(id),
+   company BIGINT NOT NULL REFERENCES public.company(id)
+);
+
+create table production_data
+(
+    id      BIGINT         NOT NULL PRIMARY KEY,
+    value   NUMERIC(12, 6) NOT NULL,
+    production BIGINT NOT NULL REFERENCES public.production (id)
+);
+
+create table production_production_group(
+   production  BIGINT NOT NULL,
+   production_group BIGINT NOT NULL,
+   PRIMARY KEY (production, production_group),
+   FOREIGN KEY (production) REFERENCES public.production(id) ON DELETE CASCADE,
+   FOREIGN KEY (production_group) REFERENCES public.production_group(id) ON DELETE CASCADE
+);
+
+CREATE SEQUENCE production_data_seq;
+CREATE SEQUENCE production_group_seq;
+CREATE sequence water_data_seq;
+
+
+create table water(
+   id SERIAL        PRIMARY KEY NOT NULL,
+   water_name  VARCHAR(150)  NOT NULL,
+   description VARCHAR(150)  NOT NULL,
+   ts timestamp not null,
+    company BIGINT NOT NULL REFERENCES public.company(id)
+);
+
+create table water_data
+(
+    id      BIGINT         NOT NULL PRIMARY KEY,
+    value   NUMERIC(12, 4) NOT NULL,
+    ts timestamp not null,
+    water_meter BIGINT NOT NULL REFERENCES public.water (id)
+);
+
+create table gas(
+   id SERIAL        PRIMARY KEY NOT NULL,
+   gas_name  VARCHAR(150)  NOT NULL,
+   description VARCHAR(150)  NOT NULL,
+   ts timestamp not null,
+    company BIGINT NOT NULL REFERENCES public.company(id)
+);
+
+create table gas_data
+(
+    id      BIGINT         NOT NULL PRIMARY KEY,
+    value   NUMERIC(12, 6) NOT NULL,
+    ts timestamp not null,
+    gas_meter BIGINT NOT NULL REFERENCES public.gas (id)
+);
+
+drop table gas_data;
+drop table water;
+drop table water_data;
+s
