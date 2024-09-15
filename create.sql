@@ -96,6 +96,7 @@ create table production_production_group(
 CREATE SEQUENCE production_data_seq;
 CREATE SEQUENCE production_group_seq;
 CREATE sequence water_data_seq;
+create sequence gas_data_seq;
 
 
 create table water(
@@ -125,7 +126,7 @@ create table gas(
 create table gas_data
 (
     id      BIGINT         NOT NULL PRIMARY KEY,
-    value   NUMERIC(12, 6) NOT NULL,
+    value   NUMERIC(12, 2) NOT NULL,
     ts timestamp not null,
     gas_meter BIGINT NOT NULL REFERENCES public.gas (id)
 );
@@ -133,4 +134,20 @@ create table gas_data
 drop table gas_data;
 drop table water;
 drop table water_data;
-s
+
+create  table key_performance_indicator_energy(
+    id      BIGINT         NOT NULL PRIMARY KEY,
+    index   NUMERIC(12, 2) NOT NULL,
+    value   NUMERIC(16, 2) NOT NULL
+);
+
+create table key_performance_indicator_production(
+    id      BIGINT         NOT NULL PRIMARY KEY,
+    value   NUMERIC(12, 2) NOT NULL,
+    target   NUMERIC(12, 2) NOT NULL,
+    ts timestamp not null,
+    production BIGINT NOT NULL REFERENCES public.production(id),
+    energy BIGINT NOT NULL REFERENCES public.key_performance_indicator_energy (id)
+);
+
+drop table key_performance_indicator_production;
