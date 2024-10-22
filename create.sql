@@ -47,6 +47,8 @@ CREATE TABLE electric_meter_data
     time_stamp                          TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
 );
 
+select * from electric_meter;
+alter table electric_meter alter column id type SERIAL ;
 
 create table unit(
    id          SERIAL        PRIMARY KEY,
@@ -97,6 +99,8 @@ CREATE SEQUENCE production_data_seq;
 CREATE SEQUENCE production_group_seq;
 CREATE sequence water_data_seq;
 create sequence gas_data_seq;
+create sequence electric_meter_seq;
+SELECT setval('electric_meter_SEQ', 9, true);
 
 
 create table water(
@@ -151,3 +155,17 @@ create table key_performance_indicator_production(
 );
 
 drop table key_performance_indicator_production;
+select * from electric_meter_monthly_data;
+drop table gas_monthly_data;
+create table gas_monthly_data(
+        id      SERIAL         NOT NULL PRIMARY KEY,
+        value_meter   NUMERIC(12, 2) NOT NULL,
+        value_tariff   NUMERIC(12, 2) NOT NULL,
+        ts date not null ,
+        gas_meter BIGINT NOT NULL REFERENCES public.gas (id)
+);
+select * from gas_monthly_data;
+
+select * from electric_meter_data
+where el_meter=1 and time_stamp>'10-1-2024';
+
